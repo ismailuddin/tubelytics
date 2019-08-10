@@ -1,5 +1,5 @@
 {
 	"scripts": {
-		"postinstall": "cd client && npm install && yarn build"
+		"postinstall": "cd client && npm install && npm run build"
 	}
 }
