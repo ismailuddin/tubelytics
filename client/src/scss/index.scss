@@ -1,0 +1,67 @@
+$very_dark_blue: #001970;
+$dark_blue: #0026ca;
+$light_blue: #e3f2fd;
+$light_gray: #cfd8dc;
+$background: #eceff1;
+
+@import "./modules/components";
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i&display=swap');
+
+.axis line,
+.axis circle {
+	stroke: #cccccc;
+	stroke-width: 1px;
+}
+
+body {
+	padding: 0;
+	box-sizing: border-box;
+	background-color: $background;
+	margin: 0;
+	font-family: 'IBM Plex Sans', Arial, Helvetica, sans-serif;
+}
+
+.content {
+	box-sizing: border-box;
+	margin-top: 50px;
+	padding: 1% 15%;
+}
+
+.card {
+	box-sizing: border-box;
+	background-color: white;
+	border-radius: 5px;
+	margin: 20px;
+	padding: 20px;
+	width: calc(100% - 40px);
+
+	.card-title {
+		font-size: 2em;
+		font-weight: 500;
+		color: $very_dark_blue;
+		display: block;
+		padding-bottom: 10px;
+		border-bottom: 1px solid $light_gray;
+		margin-bottom: 35px;
+	}
+}
+
+.navbar {
+	background-color: rgba(white, 1);
+	width: 100%;
+	position: fixed;
+	height: 45px;
+	padding: 5px 25px;
+	z-index: 99;
+	top: 0;
+  color: $dark_blue;
+
+	.title {
+		font-size: 1.5em;
+		margin: 0;
+		position: absolute;
+		top: 50%;
+		-ms-transform: translateY(-50%);
+		transform: translateY(-50%);
+	}
+}
