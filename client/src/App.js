@@ -21,7 +21,7 @@ class App extends Component {
 			formData.append("files[]", file);
 		}
 		axios.post(
-			"http://localhost:5000/api/upload",
+			"/api/upload",
 			formData,
 			{
 				"headers": {
