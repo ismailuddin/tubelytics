@@ -1,8 +1,10 @@
 from io import StringIO
 from typing import List
 from datetime import datetime
+import numpy as np
 import pandas as pd
 from oyster.preprocessing.features import *
+from oyster.utils.errors import ETLError, PreprocessingError
 
 
 WEEKDAYS = {
@@ -17,10 +19,14 @@ WEEKDAYS = {
 
 
 def compile_to_dataframe(files: list) -> pd.DataFrame:
-    return pd.concat([
-        pd.read_csv(StringIO(file.stream.read().decode()))
-        for file in files
-    ])
+    filelist_length = len(files)
+    if filelist_length == 1:
+        return pd.read_csv(StringIO(files[0].stream.read().decode()))
+    elif filelist_length > 1:
+        return pd.concat([
+            pd.read_csv(StringIO(file.stream.read().decode()))
+            for file in files
+        ])
 
 
 def process_journeys(df: pd.DataFrame) -> pd.DataFrame:
@@ -62,6 +68,9 @@ def assemble_work_commute_journeys(
     home_station: str = "Stepney Green",
     work_station: str = "Gallions Reach DLR"
 ) -> pd.DataFrame:
+    stations = np.concatenate([journeys.start.unique(), journeys.end.unique()])
+    if home_station not in stations or work_station not in stations:
+        raise PreprocessingError("Home station not in journeys!")
     commute_journeys = journeys[
         (journeys.start == home_station) & (journeys.end == work_station)
         | (journeys.start == work_station)
@@ -69,10 +78,10 @@ def assemble_work_commute_journeys(
     commute_journeys["direction"] = ""
     commute_journeys.loc[
         commute_journeys.end == work_station, "direction"
-    ] = "to_work"
+    ] = "To work"
     commute_journeys.loc[
         commute_journeys.start == work_station, "direction"
-    ] = "from_work"
+    ] = "From work"
     return commute_journeys
 
 

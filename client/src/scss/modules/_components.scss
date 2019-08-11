@@ -1,5 +1,5 @@
-.sliderContainer {
-    width: 50%; /* Width of the outside container */
+.slider-container {
+    margin-top: 10px;
 }
 .slider {
     -webkit-appearance: none;
@@ -32,12 +32,34 @@
         width: 25px;
         height: 25px;
         border-radius: 50%;
-        background: #4CAF50;
+        background: $dark_blue;
         cursor: pointer;
         
         &:hover {
             box-shadow: 0px 3px 8px rgba($dark_blue, 0.8);
         }
         
+    }
+}
+
+.week-selector {
+    display: flex;
+
+    .btn-week-selector {
+        display: inline-block;
+        margin: 5px 0px;
+        &:nth-child(1) {
+            border-radius: 5px 0px 0px 5px;
+        }
+    }
+
+    .selected-week {
+        padding: 10px 15px;
+        margin: 5px 0px;
+        text-align: center;
+        background-color: rgba($light_gray, 0.5);
+        display: inline-block;
+        font-size: 1em;
+        flex-grow: 4;
     }
 }

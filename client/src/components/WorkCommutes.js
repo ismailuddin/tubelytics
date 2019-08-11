@@ -4,7 +4,8 @@ import _ from 'lodash';
 
 export default class WorkCommutes extends Component {
     state = {
-        minValue: 0
+        minValue: 0,
+        maxValue: 5
     }
 
     colours = [
@@ -21,8 +22,10 @@ export default class WorkCommutes extends Component {
     componentDidUpdate(prevProps, prevState){
         if (this.props.data !== prevProps.data){
             const minValue = _.minBy(this.props.data, d => { return d.jt_minutes});
+            const maxValue = _.maxBy(this.props.data, d => { return d.jt_minutes});
             this.setState({
-                minValue: minValue.jt_minutes - 5
+                minValue: minValue.jt_minutes - 5,
+                maxValue: maxValue.jt_minutes + 2
             });
         }
     }
@@ -32,7 +35,7 @@ export default class WorkCommutes extends Component {
             labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             datasets: []
         }
-        const directions = ["to_work", "from_work"];
+        const directions = ["To work", "From work"];
         
         for (let i = 0; i < directions.length; i++) {
             const direction = directions[i];
@@ -58,10 +61,13 @@ export default class WorkCommutes extends Component {
                 <Bar
                     data={this.processData(this.props.data)}
                     options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    min: this.state.minValue
+                                    min: this.state.minValue,
+                                    max: this.state.maxValue
                                 },
                                 scaleLabel: {
                                     display: true,
