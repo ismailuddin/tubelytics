@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import WorkDays from './components/WorkDays';
 import WorkCommutes from './components/WorkCommutes';
+import AutocompleteTextbox from './components/AutocompleteTextbox';
 import axios from 'axios';
+import stations from './stations';
 
 class App extends Component {
 	state = {
 		workdays: [],
 		workCommutes: [],
-		fileStatus: "Choose a file"
+		fileStatus: "Choose a file",
+		workStation: "",
+		homeStation: ""
 	};
 
 	componentDidMount() {
@@ -20,6 +24,8 @@ class App extends Component {
 		for (const file of files) {
 			formData.append("files[]", file);
 		}
+		formData.append("home_station", this.state.homeStation);
+		formData.append("work_station", this.state.workStation);
 		axios.post(
 			"/api/upload",
 			formData,
@@ -58,6 +64,18 @@ class App extends Component {
 		}
 	}
 
+	setWorkStation = (value) => {
+		this.setState({
+			workStation: value
+		})
+	}
+
+	setHomeStation = (value) => {
+		this.setState({
+			homeStation: value
+		})
+	}
+
 	render() {
 		return (
 			<div className="App">
@@ -76,6 +94,18 @@ class App extends Component {
 							<b> No data</b> is stored on the server, all data is processed and returned directly back to the web browser.
 						</p>
 						<form onSubmit={this.onSubmit}>
+							<div className="row">
+								<AutocompleteTextbox
+									entries={stations}
+									label="🏡Home station"
+									updateParent={this.setHomeStation}
+									/>
+								<AutocompleteTextbox
+									entries={stations}
+									label="🏙 Work station"
+									updateParent={this.setWorkStation}
+								/>
+							</div>
 							<input
 								type="file"
 								name="files[]"
@@ -109,6 +139,11 @@ class App extends Component {
 						<WorkDays data={this.state.workdays} />
 					</div>
 				</div>
+				{/* <div className="row">
+					<div className="card">
+						<div className="card-title">Insights</div>
+					</div>
+				</div> */}
 			</div>
 		);
 	}

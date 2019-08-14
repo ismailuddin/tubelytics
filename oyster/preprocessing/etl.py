@@ -68,19 +68,21 @@ def assemble_work_commute_journeys(
     home_station: str = "Stepney Green",
     work_station: str = "Gallions Reach DLR"
 ) -> pd.DataFrame:
-    stations = np.concatenate([journeys.start.unique(), journeys.end.unique()])
-    if home_station not in stations or work_station not in stations:
-        raise PreprocessingError("Home station not in journeys!")
     commute_journeys = journeys[
-        (journeys.start == home_station) & (journeys.end == work_station)
-        | (journeys.start == work_station)
+        (journeys.start.str.contains(home_station, case=False)) & (
+            journeys.end.str.contains(work_station, case=False))
+        | (journeys.start.str.contains(work_station, case=False))
     ].copy()
+    if commute_journeys.empty:
+        raise PreprocessingError("Home or work station not in journeys!")
     commute_journeys["direction"] = ""
     commute_journeys.loc[
-        commute_journeys.end == work_station, "direction"
+        commute_journeys.end.str.contains(
+            work_station, case=False), "direction"
     ] = "To work"
     commute_journeys.loc[
-        commute_journeys.start == work_station, "direction"
+        commute_journeys.start.str.contains(
+            work_station, case=False), "direction"
     ] = "From work"
     return commute_journeys
 
@@ -130,7 +132,11 @@ def work_commute_summary(
     home_station: str = "Stepney Green",
     work_station: str = "Gallions Reach DLR"
 ) -> dict:
-    commute_journeys = assemble_work_commute_journeys(journeys)
+    commute_journeys = assemble_work_commute_journeys(
+        journeys=journeys,
+        home_station=home_station,
+        work_station=work_station
+    )
     workday_lengths = get_workday_lengths(commute_journeys)
     work_commute_lengths = get_work_commute_lengths(commute_journeys)
     return {
@@ -139,8 +145,16 @@ def work_commute_summary(
     }
 
 
-def commute_journeys_pipeline(df: pd.DataFrame) -> dict:
+def commute_journeys_pipeline(
+    df: pd.DataFrame,
+    home_station: str = "Stepney Green",
+    work_station: str = "Gallions Reach DLR"
+) -> dict:
     return (
         df.pipe(process_journeys)
-          .pipe(work_commute_summary)
+          .pipe(
+              work_commute_summary,
+              home_station=home_station,
+              work_station=work_station
+        )
     )

@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from oyster.api import api
-# from flask_cors import CORS
+from flask_cors import CORS
 
 app = Flask(
     __name__,
@@ -8,7 +8,7 @@ app = Flask(
     static_folder="../client/build",
     template_folder="../client/build"
 )
-# CORS(app)
+CORS(app)
 
 app.register_blueprint(api)
 
