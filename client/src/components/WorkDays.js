@@ -239,11 +239,8 @@ export default class WorkDays extends Component {
 	};
 
 	formatWeek = (weekNumber) => {
-		console.log(weekNumber);
 		const start = moment().day(1).isoWeek(weekNumber).format('DD/MM');
 		const end = moment().day(1).isoWeek(weekNumber + 1).format('DD/MM');
-		console.log(start);
-		console.log(end);
 		return `${start} - ${end}`;
 	};
 

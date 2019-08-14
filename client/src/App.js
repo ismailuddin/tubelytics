@@ -9,9 +9,14 @@ class App extends Component {
 	state = {
 		workdays: [],
 		workCommutes: [],
+		processed: false,
 		fileStatus: "Choose a file",
 		workStation: "",
-		homeStation: ""
+		homeStation: "",
+		earliestWorkDay: "",
+		latestWorkDay: "",
+		latestEndTime: "",
+		earliestStartTime: ""
 	};
 
 	componentDidMount() {
@@ -38,7 +43,12 @@ class App extends Component {
 			this.setState({
 				workdays: response.data.workdays,
 				workCommutes: response.data.work_commutes,
-				fileStatus: "✅ Processed successfully!"
+				earliestWorkDay: response.data.earliest_work_day,
+				latestWorkDay: response.data.latest_work_day,
+				earliestStartTime: response.data.earliest_start_time,
+				latestEndTime: response.data.latest_end_time,
+				fileStatus: "✅ Processed successfully!",
+				processed: true
 			});
 		}).catch(err => {
 			if (err.response) {
@@ -74,6 +84,47 @@ class App extends Component {
 		this.setState({
 			homeStation: value
 		})
+	}
+
+	renderInsights() {
+		if (this.state.processed) {
+			return (
+				<div className="row">
+					<div className="card">
+						<div className="card-title">Insights</div>
+						<div className="row">
+							<div className="insight" id="earliest-workday">
+								You tend to start work earliest on a
+								<span className="variable">
+									{this.state.earliestWorkDay}
+								</span>
+							</div>
+							<div className="insight" id="earliest-workday">
+								You tend to start work latest on a
+								<span className="variable">
+									{this.state.latestWorkDay}
+								</span>
+							</div>
+							<div className="insight" id="earliest-workday">
+								The earliest you've started work was at
+								<span className="variable">
+									{this.state.earliestStartTime}
+								</span>
+							</div>
+							<div className="insight" id="earliest-workday">
+								The latest you've left work was at
+								<span className="variable">
+									{this.state.latestEndTime}
+								</span>
+							</div>
+						</div>
+						<div className="row">
+							 
+						</div>
+					</div>
+				</div>
+			)
+		}
 	}
 
 	render() {
@@ -139,11 +190,7 @@ class App extends Component {
 						<WorkDays data={this.state.workdays} />
 					</div>
 				</div>
-				{/* <div className="row">
-					<div className="card">
-						<div className="card-title">Insights</div>
-					</div>
-				</div> */}
+				{ this.renderInsights() }
 			</div>
 		);
 	}

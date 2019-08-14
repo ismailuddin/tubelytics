@@ -1,4 +1,5 @@
 from io import StringIO
+import math
 from typing import List
 from datetime import datetime
 import numpy as np
@@ -8,13 +9,13 @@ from oyster.utils.errors import ETLError, PreprocessingError
 
 
 WEEKDAYS = {
-    0: "Mon",
-    1: "Tue",
-    2: "Wed",
-    3: "Thu",
-    4: "Fri",
-    5: "Sat",
-    6: "Sun"
+    0: "Monday",
+    1: "Tuesday",
+    2: "Wednesday",
+    3: "Thursday",
+    4: "Friday",
+    5: "Saturday",
+    6: "Sunday"
 }
 
 
@@ -65,8 +66,8 @@ def process_journeys(df: pd.DataFrame) -> pd.DataFrame:
 
 def assemble_work_commute_journeys(
     journeys: pd.DataFrame,
-    home_station: str = "Stepney Green",
-    work_station: str = "Gallions Reach DLR"
+    home_station: str,
+    work_station: str
 ) -> pd.DataFrame:
     commute_journeys = journeys[
         (journeys.start.str.contains(home_station, case=False)) & (
@@ -127,10 +128,42 @@ def get_work_commute_lengths(commute_journeys: pd.DataFrame) -> pd.DataFrame:
     return commute_lengths[["weekday", "direction", "jt_minutes"]]
 
 
+def get_earliest_work_day(workday_lengths: pd.DataFrame) -> str:
+    return workday_lengths.groupby(
+        "weekday"
+    ).mean().sort_values(by="start_hour").iloc[0].name
+
+
+def get_latest_work_day(workday_lengths: pd.DataFrame) -> str:
+    return workday_lengths.groupby(
+        "weekday"
+    ).mean().sort_values(
+        by="start_hour", ascending=False
+    ).iloc[0].name
+
+
+def get_earliest_start_time(workday_lengths: pd.DataFrame) -> str:
+    earliest_hour = workday_lengths.sort_values(
+        by="start_hour"
+    ).iloc[0].start_hour
+    minute, hour = math.modf(earliest_hour)
+    minute = int(minute * 60)
+    return "{:.0f}:{}".format(hour, minute)
+
+
+def get_latest_end_time(workday_lengths: pd.DataFrame) -> str:
+    latest_hour = workday_lengths.sort_values(
+        by="end_hour", ascending=False
+    ).iloc[0].end_hour
+    minute, hour = math.modf(latest_hour)
+    minute = int(minute * 60)
+    return "{:.0f}:{}".format(hour, minute)
+
+
 def work_commute_summary(
     journeys: pd.DataFrame,
-    home_station: str = "Stepney Green",
-    work_station: str = "Gallions Reach DLR"
+    home_station: str,
+    work_station: str
 ) -> dict:
     commute_journeys = assemble_work_commute_journeys(
         journeys=journeys,
@@ -138,10 +171,19 @@ def work_commute_summary(
         work_station=work_station
     )
     workday_lengths = get_workday_lengths(commute_journeys)
+    earliest_work_day = get_earliest_work_day(workday_lengths)
+    latest_work_day = get_latest_work_day(workday_lengths)
+    earliest_start_time = get_earliest_start_time(workday_lengths)
+    latest_end_time = get_latest_end_time(workday_lengths)
+
     work_commute_lengths = get_work_commute_lengths(commute_journeys)
     return {
         "workdays": workday_lengths.to_dict(orient="records"),
-        "work_commutes": work_commute_lengths.to_dict(orient="records")
+        "work_commutes": work_commute_lengths.to_dict(orient="records"),
+        "earliest_work_day": earliest_work_day,
+        "latest_work_day": latest_work_day,
+        "earliest_start_time": earliest_start_time,
+        "latest_end_time": latest_end_time
     }
 
 

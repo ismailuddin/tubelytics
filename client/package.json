@@ -5,6 +5,7 @@
   "homepage": "http://localhost:5000/public",
   "dependencies": {
     "a11y-react-emoji": "^1.0.2",
+    "animate.css": "^3.7.2",
     "axios": "^0.19.0",
     "axios-hooks": "^1.2.1",
     "chart.js": "^2.8.0",
